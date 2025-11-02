@@ -3,38 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Contacts App</title>
-  <script src="https://cdn.median.co/sdk/median.min.js"></script>
+  <title>My Contacts</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-white">
-  <div class="bg-white p-6 rounded-2xl shadow-xl text-center w-80 space-y-4 border border-blue-200">
-    <h1 class="text-3xl font-bold text-blue-600">📞 Median Contacts</h1>
-    <p class="text-gray-600 text-sm">Tap below to access your phone contacts</p>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-2xl mx-auto py-6 px-4">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-blue-600">📱 My Contacts</h1>
+      <a href="index.html" class="text-sm text-blue-500 hover:underline">← Back</a>
+    </div>
 
-    <button id="getContactsBtn"
-      class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-      Get Contacts
-    </button>
+    <input id="searchInput" type="text" placeholder="Search contacts…"
+      class="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none">
 
-    <p class="text-xs text-gray-400">Powered by Median SDK</p>
+    <div id="contactList" class="bg-white rounded-xl shadow p-4 space-y-3 text-sm"></div>
   </div>
 
   <script>
-    document.getElementById("getContactsBtn").addEventListener("click", async () => {
-      try {
-        if (!window.median || !median.contacts) {
-          alert("Median SDK not available. Please run inside Median environment.");
-          return;
-        }
+    const listEl = document.getElementById("contactList");
+    const searchInput = document.getElementById("searchInput");
 
-        const contacts = await median.contacts.getAll();
-        localStorage.setItem("contacts", JSON.stringify(contacts));
-        window.location.href = "contacts.html";
-      } catch (err) {
-        console.error("Error fetching contacts:", err);
-        alert("Failed to fetch contacts. Check permission.");
+    let allContacts = [];
+
+    function render(list) {
+      listEl.innerHTML = list.length
+        ? list.map(c => `
+          <div class="border-b border-gray-200 pb-2">
+            <h2 class="font-semibold text-gray-800">${c.displayName || "Unnamed Contact"}</h2>
+            <p class="text-gray-600">${(c.phoneNumbers || []).join(", ")}</p>
+            ${c.emails?.length ? `<p class="text-gray-500 text-xs">${c.emails.join(", ")}</p>` : ""}
+          </div>`).join("")
+        : `<p class="text-gray-500 text-center">No contacts available.</p>`;
+    }
+
+    // Load contacts saved from index.html
+    document.addEventListener("DOMContentLoaded", () => {
+      const stored = localStorage.getItem("contacts");
+      if (stored) {
+        allContacts = JSON.parse(stored);
+        render(allContacts);
       }
+    });
+
+    // Search filter
+    searchInput.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase();
+      const filtered = allContacts.filter(c =>
+        (c.displayName || "").toLowerCase().includes(q) ||
+        (c.phoneNumbers || []).some(p => p.includes(q))
+      );
+      render(filtered);
     });
   </script>
 </body>
