@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Contacts</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -22,7 +22,6 @@
   <script>
     const listEl = document.getElementById("contactList");
     const searchInput = document.getElementById("searchInput");
-
     let allContacts = [];
 
     function render(list) {
@@ -31,12 +30,10 @@
           <div class="border-b border-gray-200 pb-2">
             <h2 class="font-semibold text-gray-800">${c.displayName || "Unnamed Contact"}</h2>
             <p class="text-gray-600">${(c.phoneNumbers || []).join(", ")}</p>
-            ${c.emails?.length ? `<p class="text-gray-500 text-xs">${c.emails.join(", ")}</p>` : ""}
           </div>`).join("")
         : `<p class="text-gray-500 text-center">No contacts available.</p>`;
     }
 
-    // Load contacts saved from index.html
     document.addEventListener("DOMContentLoaded", () => {
       const stored = localStorage.getItem("contacts");
       if (stored) {
@@ -45,7 +42,6 @@
       }
     });
 
-    // Search filter
     searchInput.addEventListener("input", e => {
       const q = e.target.value.toLowerCase();
       const filtered = allContacts.filter(c =>
