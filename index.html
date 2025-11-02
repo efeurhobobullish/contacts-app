@@ -2,40 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Median Contacts App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Median Contacts Viewer</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Median SDK (loads automatically inside the app) -->
+  <!-- Median SDK -->
   <script src="https://cdn.median.co/sdk/median.min.js"></script>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-white">
+
   <div class="bg-white p-6 rounded-2xl shadow-xl text-center w-80 space-y-4 border border-blue-200">
     <h1 class="text-3xl font-bold text-blue-600">📞 Contacts App</h1>
-    <p class="text-gray-600 text-sm">Tap below to get your phone contacts</p>
+    <p class="text-gray-600 text-sm">Tap below to retrieve your contacts</p>
 
     <button id="getContactsBtn"
       class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
       Get Contacts
     </button>
 
-    <p class="text-xs text-gray-400">Works inside your Median app</p>
+    <p class="text-xs text-gray-400 mt-2">Works inside your Median-built app</p>
   </div>
 
   <script>
-    // Wait for Median SDK to be ready
+    // Helper function for safe alerts
+    const log = msg => console.log(msg) || alert(msg);
+
+    // Median SDK ready listener
     document.addEventListener("medianReady", () => {
-      console.log("✅ Median SDK loaded.");
+      log("✅ Median SDK loaded.");
 
-      document.getElementById("getContactsBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("getContactsBtn");
+      btn.addEventListener("click", async () => {
         try {
-          const contacts = await median.contacts.getContacts();
-          console.log("Contacts fetched:", contacts);
+          log("Requesting contacts...");
 
-          // Save and go to contacts page
+          // Using Median JavaScript Bridge
+          const contacts = await median.contacts.getAll();
+          log(`✅ Retrieved ${contacts.length} contacts`);
+
+          // Save in localStorage so next page can read it
           localStorage.setItem("contacts", JSON.stringify(contacts));
           window.location.href = "contacts.html";
         } catch (err) {
-          alert("Failed to get contacts: " + err.message);
+          log("⚠️ Error: " + err.message);
         }
       });
     });
